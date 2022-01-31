@@ -1,5 +1,5 @@
 import { GLOBALTYPES } from './globalTypes'
-import { postDataAPI } from '../../utils/fetchData'
+import { postDataAPI } from '../../utils/fetchData.js'
 import valid from '../../utils/valid'
 
 
