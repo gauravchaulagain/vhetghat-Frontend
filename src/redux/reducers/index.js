@@ -7,4 +7,6 @@ export default combineReducers({
    auth,
    alert,
    theme,
+   
+
 })
