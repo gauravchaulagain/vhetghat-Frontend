@@ -1,3 +1,15 @@
+import React, { useState, useEffect, useRef } from 'react'
+import UserCard from '../UserCard'
+import { useSelector, useDispatch } from 'react-redux'
+import { useParams, useHistory } from 'react-router-dom'
+import MsgDisplay from './MsgDisplay'
+import Icons from '../Icons'
+import { GLOBALTYPES } from '../../redux/actions/globalTypes'
+import { imageShow, videoShow } from '../../utils/mediaShow'
+import { imageUpload } from '../../utils/imageUpload'
+import { addMessage, getMessages, loadMoreMessages, deleteConversation } from '../../redux/actions/messageAction'
+import LoadIcon from '../../images/loading.gif'
+
 const RightSide = () => {
     const { auth, message, theme, socket, peer } = useSelector(state => state)
     const dispatch = useDispatch()
@@ -26,6 +38,7 @@ const RightSide = () => {
             setPage(newData.page)
         }
     },[message.data, id])
+
     useEffect(() => {
         if(id && message.users.length > 0){
             setTimeout(() => {
@@ -86,6 +99,7 @@ const RightSide = () => {
             refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
         }
     }
+
     useEffect(() => {
         const getMessagesData = async () => {
             if(message.data.every(item => item._id !== id)){
@@ -129,7 +143,41 @@ const RightSide = () => {
         }
     }
 
+    // Call
+    const caller = ({video}) => {
+        const { _id, avatar, username, fullname } = user
 
+        const msg = {
+            sender: auth.user._id,
+            recipient: _id, 
+            avatar, username, fullname, video
+        }
+        dispatch({ type: GLOBALTYPES.CALL, payload: msg })
+    }
+
+    const callUser = ({video}) => {
+        const { _id, avatar, username, fullname } = auth.user
+
+        const msg = {
+            sender: _id,
+            recipient: user._id, 
+            avatar, username, fullname, video
+        }
+
+        if(peer.open) msg.peerId = peer._id
+
+        socket.emit('callUser', msg)
+    }
+
+    const handleAudioCall = () => {
+        caller({video: false})
+        callUser({video: false})
+    }
+    
+    const handleVideoCall = () => {
+        caller({video: true})
+        callUser({video: true})
+    }
 
     return (
         <>
@@ -229,3 +277,5 @@ const RightSide = () => {
         </>
     )
 }
+
+export default RightSide
